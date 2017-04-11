@@ -3,7 +3,7 @@
 # 
 # call: cube = Flukato3dMatrix(filename, directory,1)
 # np.save('filename', cube)
-# np.load('filename.pp')
+# #np.load('filename.py')
 # Input file needs to be in ASCII format
 # Output cube is 3D matrix numpy array
 # The last input value can be set to 0 if no plotting of the cubes are desired
