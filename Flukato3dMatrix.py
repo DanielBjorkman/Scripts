@@ -24,6 +24,7 @@ def Flukato3dMatrix(filename, directory,plot):
     RZ = 0
     CAR = 0
     row = 0
+    print("Hej")
 
     #Predefine information into info directory and find starting position
     with open(filename) as file:
@@ -100,23 +101,26 @@ def Flukato3dMatrix(filename, directory,plot):
         print("Function currently not defined for minimum rbins other than 0")
         return;
 
-    #Reads in all elements horisontally and puts them into list
-    list = []
-    row = 0
-    with open(filename) as file:
-        for line in file.readlines():
-            row = row + 1
-            if row >= start:
-                line_content = line.split()
-                if not line_content:
-                    break 
-                for i in range(0,10):
-                    list.append(float(line_content[i]))
-    if RPZ or RZ: 
-        print(str(len(list)) + " elements read out of " + str(int(info['zbin'][0] * info['rbin'][0] * info['pbin'][0])) + " from file.")
-    else:
-        print(str(len(list)) + " elements read out of " + str(int(info['zbin'][0] * info['xbin'][0] * info['ybin'][0])) + " from file.")
-       
+    #Reads in all elements horisontally and puts them into a one dimensional array called data
+#    list = []
+#    row = 0
+#    with open(filename) as file:
+#        for line in file.readlines():
+#            row = row + 1
+#            if row >= start:
+#                line_content = line.split()
+#                if not line_content:
+#                    break 
+#                for i in range(0,10):
+#                    list.append(float(line_content[i]))
+#    if RPZ or RZ: 
+#       print(str(len(list)) + " elements read out of " + str(int(info['zbin'][0] * info['rbin'][0] * info['pbin'][0])) + " from file.")
+#    else:
+#        print(str(len(list)) + " elements read out of " + str(int(info['zbin'][0] * info['xbin'][0] * info['ybin'][0])) + " from file.")
+    
+    data = np.loadtxt(filename,skiprows=start)    
+    data = np.reshape(data ,(file.size,1))
+
 
     import math
     import numpy as np
@@ -210,12 +214,13 @@ def Flukato3dMatrix(filename, directory,plot):
         cube = cube + tmpCube
 
     else:
-         cube = np.zeros((int(info['xbin'][0]),int(info['ybin'][0]),int(info['zbin'][0])))
+        cube = np.reshape(file2, (100,200,200),order='F')
+         #cube = np.zeros((int(info['xbin'][0]),int(info['ybin'][0]),int(info['zbin'][0])))
 
-         for z in range(0,int(info['zbin'][0])):
-              for y in range(0,int(info['ybin'][0])):
-                   for x in range(0,int(info['xbin'][0])):
-                        cube[x,y,z] = list.pop(0)
+         #for z in range(0,int(info['zbin'][0])):
+          #    for y in range(0,int(info['ybin'][0])):
+           #        for x in range(0,int(info['xbin'][0])):
+            #            cube[x,y,z] = list.pop(0)
 
     end = time.time()
     print("Cube reconstructed in " + str(round(end - startTime,2)) + " seconds")
