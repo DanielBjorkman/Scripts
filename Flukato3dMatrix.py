@@ -3,7 +3,7 @@
 # 
 # call: cube = Flukato3dMatrix(filename, directory,1)
 # np.save('filename', cube)
-# #np.load('filename.py')
+# #np.load('filename.npy')
 # Input file needs to be in ASCII format
 # Output cube is 3D matrix numpy array
 # The last input value can be set to 0 if no plotting of the cubes are desired
@@ -49,7 +49,7 @@ def Flukato3dMatrix(filename, directory,plot):
                     if isinstance(a, float) and len(line_content) > 1:
                         start = row
                         break
-               except Exception as e:
+                except Exception as e:
                     pass
 
     #Return if file is of wrong format
@@ -226,34 +226,38 @@ def Flukato3dMatrix(filename, directory,plot):
         from matplotlib.colors import LogNorm
         import matplotlib.gridspec as gridspec
 
-        #Z-index of maxiumum value in cube
-        _,_,k = np.unravel_index(cube.argmax(), cube.shape)
-     
+        #Determines the indecies of maxiumum value in cube
+        i,j,k = np.unravel_index(cube.argmax(), cube.shape)
+
+        #Arbitrary scaling     
         vmax = cube.max()
         vmin = np.min(cube[np.nonzero(cube)])
-
         if int(math.log10(vmax)) - int(math.log10(vmin)) > 14 :
             vmin = vmax * math.pow(10,-14)
 
         gs0 = gridspec.GridSpec(1, 3)
         gs00 = gridspec.GridSpecFromSubplotSpec(3, 1, subplot_spec=gs0[0])
-        plt.subplot(gs0[1:])
+        ax = plt.subplot(gs0[1:])
         image = cube[0:,0:,k]
+        image = np.rot90(image,3)
+        def y_fmt(x, y):
+            return cube.shape[0] - x
+        ax.xaxis.set_major_formatter(tick.FuncFormatter(y_fmt))
         plt.pcolor(image, norm=LogNorm(vmin=vmin, vmax=vmax), cmap='jet')
         plt.colorbar()
         plt.title('Z plane')
-        plt.xlabel('X- axis')
+        plt.xlabel('X- axis [Currently reversed order]')
         plt.ylabel('Y- axis')
 
         plt.subplot(gs00[0])
-        image = cube[int(cube.shape[0]/2),0:,0:]
+        image = cube[i,0:,0:]
         plt.pcolor(image, norm=LogNorm(vmin=vmin, vmax=vmax), cmap='jet')
         plt.title('X plane')
         plt.xlabel('Z- axis')
         plt.ylabel('Y- axis')
 
         plt.subplot(gs00[1])
-        image = cube[0:,int(cube.shape[1]/2),0:]
+        image = cube[0:,j,0:]
         plt.pcolor(image, norm=LogNorm(vmin=vmin, vmax=vmax), cmap='jet')
         plt.title('Y plane')
         plt.xlabel('Z- axis')
