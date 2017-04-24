@@ -16,6 +16,8 @@ def Flukato3dMatrix(filename, directory,plot):
 
     import os
     import time
+    import math
+    import numpy as np
 
     startTime = time.time()
     os.chdir(directory)
@@ -24,7 +26,7 @@ def Flukato3dMatrix(filename, directory,plot):
     RZ = 0
     CAR = 0
     row = 0
-    print("Hej")
+    print("Hejsan")
 
     #Predefine information into info directory and find starting position
     with open(filename) as file:
@@ -119,11 +121,9 @@ def Flukato3dMatrix(filename, directory,plot):
 #        print(str(len(list)) + " elements read out of " + str(int(info['zbin'][0] * info['xbin'][0] * info['ybin'][0])) + " from file.")
     
     data = np.loadtxt(filename,skiprows=start)    
-    data = np.reshape(data ,(file.size,1))
+    data = np.reshape(data ,(data.size,1))
 
 
-    import math
-    import numpy as np
 
     #Cube reconstruction from list
     print("Reconstructing 3D cube...")
@@ -214,7 +214,7 @@ def Flukato3dMatrix(filename, directory,plot):
         cube = cube + tmpCube
 
     else:
-        cube = np.reshape(file2, (100,200,200),order='F')
+        cube = np.reshape(data, (100,200,200),order='F')
          #cube = np.zeros((int(info['xbin'][0]),int(info['ybin'][0]),int(info['zbin'][0])))
 
          #for z in range(0,int(info['zbin'][0])):
