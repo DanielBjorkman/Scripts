@@ -16,8 +16,6 @@ def Flukato3dMatrix(filename, directory,plot):
 
     import os
     import time
-    import math
-    import numpy as np
 
     startTime = time.time()
     os.chdir(directory)
@@ -26,7 +24,6 @@ def Flukato3dMatrix(filename, directory,plot):
     RZ = 0
     CAR = 0
     row = 0
-    print("Hejsan")
 
     #Predefine information into info directory and find starting position
     with open(filename) as file:
@@ -103,6 +100,10 @@ def Flukato3dMatrix(filename, directory,plot):
         print("Function currently not defined for minimum rbins other than 0")
         return;
 
+
+    import math
+    import numpy as np
+
     #Reads in all elements horisontally and puts them into a one dimensional array called data
 #    list = []
 #    row = 0
@@ -120,9 +121,8 @@ def Flukato3dMatrix(filename, directory,plot):
 #    else:
 #        print(str(len(list)) + " elements read out of " + str(int(info['zbin'][0] * info['xbin'][0] * info['ybin'][0])) + " from file.")
     
-    data = np.loadtxt(filename,skiprows=start)    
+    data = np.loadtxt(filename,skiprows=start-1)    
     data = np.reshape(data ,(data.size,1))
-
 
 
     #Cube reconstruction from list
@@ -214,7 +214,10 @@ def Flukato3dMatrix(filename, directory,plot):
         cube = cube + tmpCube
 
     else:
-        cube = np.reshape(data, (100,200,200),order='F')
+        cube = np.reshape(data, (int(info['xbin'][0]),int(info['ybin'][0]),int(info['zbin'][0])),order='F')
+ #       cube = np.rot90(cube,3)
+ #       cube = np.fliplr(cube)
+#        cube = np.swapaxes(cube,0,1)
          #cube = np.zeros((int(info['xbin'][0]),int(info['ybin'][0]),int(info['zbin'][0])))
 
          #for z in range(0,int(info['zbin'][0])):
@@ -245,13 +248,11 @@ def Flukato3dMatrix(filename, directory,plot):
         ax = plt.subplot(gs0[1:])
         image = cube[0:,0:,k]
         image = np.rot90(image,3)
-        def y_fmt(x, y):
-            return cube.shape[0] - x
-        ax.xaxis.set_major_formatter(tick.FuncFormatter(y_fmt))
         plt.pcolor(image, norm=LogNorm(vmin=vmin, vmax=vmax), cmap='jet')
-        plt.colorbar()
+        cbar = plt.colorbar()
+        cbar.set_label('Intensity')
         plt.title('Z plane')
-        plt.xlabel('X- axis [Currently reversed order]')
+        plt.xlabel('X- axis')
         plt.ylabel('Y- axis')
 
         plt.subplot(gs00[0])
@@ -275,10 +276,12 @@ def Flukato3dMatrix(filename, directory,plot):
         plt.plot(range(0,cube.shape[2]),vector)
         plt.title('Integrated depth deposition')
         plt.xlabel('Z- axis')
+        plt.ylabel('Integrated intensity')
         plt.grid()
 
         plt.show()
 
+        a= 0
 
     return cube;
 
