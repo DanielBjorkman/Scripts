@@ -104,23 +104,7 @@ def Flukato3dMatrix(filename, directory,plot):
     import math
     import numpy as np
 
-    #Reads in all elements horisontally and puts them into a one dimensional array called data
-#    list = []
-#    row = 0
-#    with open(filename) as file:
-#        for line in file.readlines():
-#            row = row + 1
-#            if row >= start:
-#                line_content = line.split()
-#                if not line_content:
-#                    break 
-#                for i in range(0,10):
-#                    list.append(float(line_content[i]))
-#    if RPZ or RZ: 
-#       print(str(len(list)) + " elements read out of " + str(int(info['zbin'][0] * info['rbin'][0] * info['pbin'][0])) + " from file.")
-#    else:
-#        print(str(len(list)) + " elements read out of " + str(int(info['zbin'][0] * info['xbin'][0] * info['ybin'][0])) + " from file.")
-    
+    #Reads in all elements and puts them into a one dimensional array called data
     data = np.loadtxt(filename,skiprows=start-1)    
     data = np.reshape(data ,(data.size,1))
 
@@ -136,10 +120,14 @@ def Flukato3dMatrix(filename, directory,plot):
         stepConverter = 100
 
         #Reconstructs the R-Phi-Z binning into cartesian coordinate system
+        Rvector = np.zeros((int(info['rbin'][0]),1))
+        tracker = 0
         for z in range(0, int(info['zbin'][0])):
-            for phi in range(0,int(info['pbin'][0])):
-                Rvector = list[0:int(info['rbin'][0])]
-                del list[:int(info['rbin'][0])]
+            for phi in range(0,int(info['pbin'][0])):     
+                Rvector = data[range(0 +tracker*int(info['rbin'][0]),(tracker +1)*int(info['rbin'][0])),0]   
+                tracker = tracker +1        
+               # Rvector = list[0:int(info['rbin'][0])]
+               # del list[:int(info['rbin'][0])]
                 for r in range(0,int(info['rbin'][0])):
                     val = Rvector[r]
                     steps = int(math.ceil(math.pi * (r + 1) * float(phiBinAngle) / 180))
@@ -178,9 +166,11 @@ def Flukato3dMatrix(filename, directory,plot):
         stepConverter = 100      
 
         #Reconstructs the R-Z binning into cartesian coordinate system
+        Rvector = np.zeros((int(info['rbin'][0]),1))
+        tracker = 0
         for z in range(0, int(info['zbin'][0])):
-                Rvector = list[0:int(info['rbin'][0])]
-                del list[:int(info['rbin'][0])]
+                Rvector = data[range(0 +tracker*int(info['rbin'][0]),(tracker +1)*int(info['rbin'][0])),0]   
+                tracker = tracker +1 
                 for r in range(0,int(info['rbin'][0])):
                     val = Rvector[r]
                     steps = int(math.ceil(math.pi * (r + 1) * float(phiBinAngle) / 180))
@@ -215,15 +205,7 @@ def Flukato3dMatrix(filename, directory,plot):
 
     else:
         cube = np.reshape(data, (int(info['xbin'][0]),int(info['ybin'][0]),int(info['zbin'][0])),order='F')
- #       cube = np.rot90(cube,3)
- #       cube = np.fliplr(cube)
-#        cube = np.swapaxes(cube,0,1)
-         #cube = np.zeros((int(info['xbin'][0]),int(info['ybin'][0]),int(info['zbin'][0])))
 
-         #for z in range(0,int(info['zbin'][0])):
-          #    for y in range(0,int(info['ybin'][0])):
-           #        for x in range(0,int(info['xbin'][0])):
-            #            cube[x,y,z] = list.pop(0)
 
     end = time.time()
     print("Cube reconstructed in " + str(round(end - startTime,2)) + " seconds")
@@ -281,7 +263,7 @@ def Flukato3dMatrix(filename, directory,plot):
 
         plt.show()
 
-        a= 0
+
 
     return cube;
 
