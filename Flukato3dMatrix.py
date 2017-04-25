@@ -219,6 +219,7 @@ def Flukato3dMatrix(filename, directory,plot):
         import matplotlib.pyplot as plt
         from matplotlib.colors import LogNorm
         import matplotlib.gridspec as gridspec
+        import matplotlib.ticker as ticker
 
         #Determines the indecies of maxiumum value in cube
         i,j,k = np.unravel_index(cube.argmax(), cube.shape)
@@ -234,6 +235,10 @@ def Flukato3dMatrix(filename, directory,plot):
         ax = plt.subplot(gs0[1:])
         image = cube[0:,0:,k]
         image = np.rot90(image,3)
+        if CAR:
+            def y_fmt(x, y):
+                return cube.shape[0] - x
+            ax.xaxis.set_major_formatter(ticker.FuncFormatter(y_fmt))
         plt.pcolor(image, norm=LogNorm(vmin=vmin, vmax=vmax), cmap='jet')
         cbar = plt.colorbar()
         cbar.set_label('Intensity')
