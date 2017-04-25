@@ -1,16 +1,19 @@
 
-# Python function for parsing FLUKA ASCII formatted USRBIN into 3D Matrix called cube
+# Python function for parsing FLUKA ASCII formatted USRBIN into a 3D matrix called cube
 # 
 # call: cube = Flukato3dMatrix(filename, directory,1)
 # np.save('filename', cube)
 # #np.load('filename.npy')
+#
+#
 # Input file needs to be in ASCII format
-# Output cube is 3D matrix numpy array
-# The last input value can be set to 0 if no plotting of the cubes are desired
+# Output cube is a 3D matrix numpy array
+# The last input value can be set to 0 if no plotting of the cube is desired
 #
 # Required python libraries: Numpy, Matplotlib
 #
-# Developed by Daniel Bjorkman at CERN 2016
+#
+# Developed by Daniel Bjorkman at CERN 2016 - 2017
 # daniel.bjorkman@cern.ch
 def Flukato3dMatrix(filename, directory,plot):
 
@@ -165,7 +168,7 @@ def Flukato3dMatrix(filename, directory,plot):
         y0 = int(info['rbin'][0]) - 0.5
         stepConverter = 100      
 
-        #Reconstructs the R-Z binning into cartesian coordinate system
+        #Reconstructs a quarter of the R-Z binning into cartesian coordinate system
         Rvector = np.zeros((int(info['rbin'][0]),1))
         tracker = 0
         for z in range(0, int(info['zbin'][0])):
@@ -198,6 +201,7 @@ def Flukato3dMatrix(filename, directory,plot):
                         checkedVal[x,y,z] = 1
         print("Missing values interpolated")
 
+        #Mirror the constructed quarter to fill the rest of the cube
         tmpCube = np.fliplr(cube)
         cube = cube + tmpCube
         tmpCube = np.flipud(cube)
@@ -219,7 +223,7 @@ def Flukato3dMatrix(filename, directory,plot):
         #Determines the indecies of maxiumum value in cube
         i,j,k = np.unravel_index(cube.argmax(), cube.shape)
 
-        #Arbitrary scaling     
+        #Conditional color scaling     
         vmax = cube.max()
         vmin = np.min(cube[np.nonzero(cube)])
         if int(math.log10(vmax)) - int(math.log10(vmin)) > 14 :
