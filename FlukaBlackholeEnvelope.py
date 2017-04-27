@@ -9,8 +9,8 @@ Envfilename = 'Env' + filename
 import os
 os.chdir(directory)
 
-from shutil import copyfile
-copyfile(filename, Envfilename)
+#from shutil import copyfile
+#copyfile(filename, Envfilename)
 
 info = {'Geobegin':[],'end1':[],'end2':[],'newline':[],'position':[], 'BLCKHOLE':[]}
 
@@ -19,8 +19,6 @@ row = 0
 with open(filename) as file:
      for line in file.readlines():
          line_content = line.split()
-         if row ==107:
-            a = 0
          if line.lstrip(' ').partition(' ')[0] == 'GEOBEGIN':
              info['Geobegin'].append(row)
          if line.lstrip(' ').partition(' ')[0] == 'END\n':
@@ -39,45 +37,57 @@ with open(filename) as file:
 String = '+Envelope '
 negString = '-Envelope '
 
-EnvelopeBody = 'RPP Envelope   -100.00 100.00 -100.00 100.00 -100.00 100.00'
+EnvelopeBody = 'RPP Envelope   -100.00 100.00 -100.00 100.00 -100.00 100.00\n'
 
+f = open(filename,"r+")
+lines = f.readlines()
 
-#Overwrites all relevant lines
-row = 0
-with open(filename) as file, open(Envfilename, 'w') as output_file:
-     for line in file.readlines():
-         row = row + 1
-         if row <= info['end1'][0] or row > info['end2'][0]:
-            output_file.write(line)
- #        if row == info['Geobegin'][0]+2:
-  #          output_file.insert(EnvelopeBody)
-         #Regions
-         if row > info['end1'][0] +1 and row <= info['end2'][0] :
-            line_content = line.split()
-            if line_content[0] != '*':
-                if line_content[0] != info['BLCKHOLE'][0]:
-                    info['newline'].append(line[:15] + String + line[15:])
-                    info['position'].append(row)
-                    output_file.write(line[:15] + String + line[15:])
-                else:
-                    info['newline'].append(line[:15] + negString + line[15:])
-                    info['position'].append(row)
-                    output_file.write(line[:15] + negString + '\n')
+for row in range(0,len(lines)):
+    #Add Envelope body
+ #   if row == info['Geobegin'][0]+2:
+ #       lines.append(EnvelopeBody)
+    #Modify all regions
+    if row > info['end1'][0] +1 and row < info['end2'][0] :
+        line_content = lines[row].split(' ')
+        if line_content[0] != '*':
+            if line_content[0] != info['BLCKHOLE'][0]:
+                info['newline'].append(lines[row][:15] + String + lines[row][15:])
+                info['position'].append(row)
+                lines[row]=lines[row][:15] + String + lines[row][15:]
             else:
-                output_file.write(line)
+                info['newline'].append(lines[row][:15] + negString + lines[row][15:])
+                info['position'].append(row)
+                lines[row] = lines[row][:15] + negString + '\n'
 
 
-#f = open(Envfilename,"r+")
-#lines = f.readlines()
+lines2 = lines[0:info['Geobegin'][0]+2]
+lines2.append(EnvelopeBody)
+lines2[info['Geobegin'][0]+3:] = lines[info['Geobegin'][0]+2:]
+#lines2.append(lines[info['Geobegin'][0]+2:])
+
+#append(EnvelopeBody,lines,info['Geobegin'][0]+2)
+#lines[info['Geobegin'][0]+3:] = lines[info['Geobegin'][0]+2:]
+#lines.insert(info['Geobegin'][0]+2, EnvelopeBody)
+
+#for i in range(0,len(list)):
+ #   if i
+
+with open(Envfilename, 'w') as output:
+    output.writelines(lines2)
+
+
+a = 0
+
+
 #lines.insert(info['Geobegin'][0]+2,EnvelopeBody)
 #f.close()
 
-with open(Envfilename, 'r+') as output:
-    output.seek(40,0)
-    output.write(EnvelopeBody)
+#with open(Envfilename, 'r+') as output:
+ #   output.seek(40,0)
+  #  output.write(EnvelopeBody)
 
     #info['Geobegin'][0]+2
-a = 0
+
 #with open(Envfilename) as file, open(Envfilename, 'w') as output:
  #   output.insert(EnvelopeBody)
     
